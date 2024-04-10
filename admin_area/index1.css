@@ -1,0 +1,22 @@
+.bgcolor{
+  background-color:#dad1bc ;  
+}
+.prettyfont{
+    font-family: 'Mooli', sans-serif;
+}
+.prettybutton{
+    border-radius: 10%;
+    box-shadow: #dad1bc;
+}
+.flex-item{
+    text-align: center;
+    font-size:20px;
+    padding:3px;
+    margin-top: 2px;
+}
+.btn-info{
+    background-color:#dad1bc;
+}
+table, th, td {
+    border: 1px solid black;
+  }

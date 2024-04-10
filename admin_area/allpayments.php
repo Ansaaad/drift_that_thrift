@@ -1,0 +1,200 @@
+<?php
+session_start();
+// $_SESSION["cid"]=$cid;
+// $cid = $_REQUEST["cid"]; 
+if(isset($_SESSION["aid"])){
+	$aid = $_SESSION["aid"]; 
+} else{
+    header("Location: admin_login.php");
+}
+// Assuming you have your database connection details
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "drift that thrift";
+
+// Create a connection to the database
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check if the connection was successful
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+?> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <!-- css link -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prettyPhoto.css" rel="stylesheet">
+    <link href="../css/price-range.css" rel="stylesheet">
+    <link href="../css/animate.css" rel="stylesheet">
+    <link href="../styles.css" rel="stylesheet">
+    <link href="../css/responsive.css" rel="stylesheet">
+    <link href="./index1.css" rel="stylesheet">
+    <link href="../cart.css" rel="stylesheet">
+    <link rel="stylesheet" href="index1.css">
+    <!-- bootstarp link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mooli&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>view order!</header>
+  <!-- navbar -->
+  <?php
+ include("nav1.php");
+ ?>
+</div>
+	</div>
+	<section id="cart_items">
+    <div class="container">
+        <h1 class="prettyfont text-center">All payments</h1>
+        <div class="table-responsive cart_info">
+            <table  class="table table-condensed">
+                <!-- //<td class="description">Name</td>
+						<td class="description">Description</td>
+                        <td class="price">Price</td>
+                        <td class="price">Rating</td>
+						<td class="description">Image</td>
+						<td class="description">Category</td>
+						<td class="description">Inserted Date</td>
+						<td class="description">Updated Date</td>
+                        <td></td> -->
+                <thead >
+                    <tr class="cart_menu">
+                    <th class="price">Order ID</th>   
+                    <th class="price">Product ID</th>
+                    <th class="description">Product Name</th>
+                    <th class="price">Product Price</th>
+                    <th class="price">Customer ID</th>
+                    <th class="description">Customer Name</th>
+                    <th class="price">Seller ID</th>
+                    <th class="description">Seller ID</th>
+                    <th class="price">Total Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
+    // Display the retrieved customer details in a table
+
+    $sql = "SELECT
+    o.oid AS orderid, -- Include the orderid
+    p.id AS product_id,
+    p.name AS product_name,
+    p.price AS product_price,
+    c.name AS customer_name,
+    c.id AS customer_id,
+    sp.cid AS seller_id,
+    cs.name AS seller_name,
+    b.totalpurchase AS totalpurchase
+FROM
+    products p
+JOIN
+    seller_product sp ON p.id = sp.pid
+JOIN
+    customers c ON sp.cid = c.id
+JOIN
+    customers cs ON sp.cid = cs.id
+JOIN
+    orders o ON p.id = o.pid -- Join with the orders table to get orderid
+JOIN
+    bill_to_details b ON o.oid = b.oid
+WHERE
+    p.status = 2;
+
+";
+
+// Execute your SQL query and fetch the results
+$result = mysqli_query($conn, $sql);
+
+// Check for errors in query execution
+if (!$result) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+// Initialize an empty array to store the modified results
+$modifiedResults = array();
+
+// Fetch and modify each row
+while ($row = mysqli_fetch_assoc($result)) {
+    // Rename the columns
+    $modifiedRow = array(
+        'orderid'=>$row['orderid'],
+        'product_id' => $row['product_id'],
+        'product_name' => $row['product_name'],
+        'product_price' => $row['product_price'],
+        'customer_id' => $row['customer_id'],
+        'customer_name' => $row['customer_name'],
+        'seller_id' => $row['seller_id'],
+        'seller_name' => $row['seller_name'],
+        'totalpurchase'=>$row['totalpurchase']
+    );
+    
+
+    // Add the modified row to the results array
+    $modifiedResults[] = $modifiedRow;
+}
+
+foreach ($modifiedResults as $row) {
+ ?>
+ <tr>
+       <td class="cart_price">
+            <?php echo $row['orderid'] ?>
+        </td>
+
+            <td class="cart_description">
+            <?php echo $row['product_id'] ?>
+        </td>
+
+        <td class="cart_description">
+            <?php echo $row['product_name'] ?>
+        </td>
+        <td class="cart_price">
+            <?php echo $row['product_price'] ?>
+        </td>
+        <td class="cart_price">
+            <?php echo $row['customer_id'] ?>
+        </td>
+        <td class="cart_description">
+            <?php echo $row['customer_name'] ?>
+        </td>
+        <td class="cart_description">
+            <?php echo $row['seller_id'] ?>
+        </td>
+        <td class="cart_description">
+            <?php echo $row['seller_name'] ?>
+        </td>
+        <td class="cart_price">
+            <?php echo $row['totalpurchase'] ?>
+        </td>
+        
+    </tr>
+<?php
+        }
+// Close the database connection
+$conn->close();
+?>
+
+
+     <!-- javascript link-->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    crossorigin="anonymous"></script>
+	<script src="js/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.scrollUp.min.js"></script>
+	<script src="js/price-range.js"></script>
+	<script src="js/jquery.prettyPhoto.js"></script>
+	<script src="js/main.js"></script>
+                    </tbody>
+                </table>
